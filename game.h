@@ -22,8 +22,10 @@
 #define GAME_MOJI_MARU	"○"	//○の文字
 #define GAME_MOJI_BATU	"×"	//×の文字
 
-#define GAME_PLAYER_MARU	1	//○の種類
-#define GAME_PLAYER_BATU	2	//×の種類
+//プレイヤー管理
+#define GAME_PLAYER_INIT	0	//初期状態
+#define GAME_PLAYER_MARU	1	//○のプレイヤー
+#define GAME_PLAYER_BATU	2	//×のプレイヤー
 
 //○や×の大きさ
 #define GAME_OX_SIZE  100	//GAME_OX_SIZE × GAME_OX_SIZEの大きさで作成 

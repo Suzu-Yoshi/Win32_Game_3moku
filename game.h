@@ -5,6 +5,7 @@
 ///########## ヘッダファイル読み込み ##########
 #include <stdio.h>
 #include <windows.h>
+#include <time.h>
 #include <locale.h>
 #include "main.h"
 
@@ -14,18 +15,13 @@
 #define GAME_MASU_MAX	3	//GAME_MASU_MAX × GAME_MASU_MAXのマスを作成
 
 //マス目の状態
-#define GAME_MASU_NONE	0	//空白のとき
-#define GAME_MASU_MARU	1	//○のとき
-#define GAME_MASU_BATU	2	//×のとき
+#define GAME_MASU_NONE	0	//初期状態
+#define GAME_MASU_MARU	1	//○のとき：先攻
+#define GAME_MASU_BATU	2	//×のとき：後攻
 
 //表示する文字
 #define GAME_MOJI_MARU	"○"	//○の文字
 #define GAME_MOJI_BATU	"×"	//×の文字
-
-//プレイヤー管理
-#define GAME_PLAYER_INIT	0	//初期状態
-#define GAME_PLAYER_MARU	1	//○のプレイヤー
-#define GAME_PLAYER_BATU	2	//×のプレイヤー
 
 //○や×の大きさ
 #define GAME_OX_SIZE  100	//GAME_OX_SIZE × GAME_OX_SIZEの大きさで作成 
@@ -51,8 +47,11 @@
 //ゲーム内の計算をする関数
 extern VOID MY_CALC_GAME(VOID);
 
-//マスをクリックしたときの配列の処理の関数
-extern VOID MY_CLICK_MASU(POINT,int);
+//マスをクリックしたときの処理を行う関数
+extern VOID MY_CLICK_MASU(VOID);
+
+//マスをクリックしたときの配列の変更を行う関数
+extern VOID MY_CHANGE_MASU(POINT,int);
 
 //画面を描画する関数
 extern VOID MY_DRAW_GAME(MY_WIN);
@@ -74,5 +73,11 @@ extern VOID MY_DRAW_OX(HDC);
 
 //マウスの位置を表示する関数
 extern VOID MY_DRAW_MOUSE_POINT(HDC);
+
+//プレイヤーの番を初期化する関数
+extern VOID MY_INIT_PLAYER_TURN(VOID);
+
+//勝敗チェックをする関数
+extern VOID MY_CHECK_WIN_LOSE(VOID);
 
 ///▲▲▲▲▲ 本体はgame.cpp ▲▲▲▲▲

@@ -51,6 +51,9 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 		//マスの初期化
 		MY_INIT_MASU();
 
+		//プレイヤーの初期化
+		MY_INIT_PLAYER_TURN();
+
 		//文字の初期化
 		MY_FONT_INIT();
 
@@ -107,8 +110,11 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 		MyWin.point_Mouse.y = HIWORD(lp);
 		MyWin.point_Mouse.x = LOWORD(lp);
 
-		//マスをクリックしたときの配列の処理
-		MY_CLICK_MASU(MyWin.point_Mouse, GAME_PLAYER_BATU);
+		//マスをクリックしたときの処理を行う
+		MY_CLICK_MASU();
+
+		//勝敗チェック
+		MY_CHECK_WIN_LOSE();
 
 		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 

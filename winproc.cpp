@@ -80,6 +80,9 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 		//FPSの数値を描画
 		MY_FPS_DRAW(MyWin.hdc_double);
 
+		//マウスの座標を描画
+		MY_DRAW_MOUSE_POINT(MyWin.hdc_double);
+
 		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 
 		//メモリ内の画像を描画
@@ -97,6 +100,17 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
 	case WM_LBUTTONDOWN:
 		//マウスの左ボタンを押しているとき
+
+		///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
+		
+		//マウスの座標を取得
+		MyWin.point_Mouse.y = HIWORD(lp);
+		MyWin.point_Mouse.x = LOWORD(lp);
+
+		//マスをクリックしたときの配列の処理
+		MY_CLICK_MASU(MyWin.point_Mouse, GAME_PLAYER_BATU);
+
+		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 
 		//タイトルバーがないとき
 		if (MyWin.win_mode == WIN_NO_TITLE)
@@ -127,6 +141,13 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		//クライアント領域外でもマウスの動きの監視を終了
 		ReleaseCapture();
+
+		break;
+	case WM_MOUSEMOVE:
+
+		//マウスの座標を取得
+		MyWin.point_Mouse.y = HIWORD(lp);
+		MyWin.point_Mouse.x = LOWORD(lp);
 
 		break;
 

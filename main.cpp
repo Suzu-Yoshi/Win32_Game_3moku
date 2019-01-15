@@ -6,6 +6,7 @@
 #include "main.h"
 #include "fps.h"
 #include "winproc.h"
+#include "game.h"
 
 ///########## ライブラリ読み込み ##########
 
@@ -103,6 +104,13 @@ int WINAPI WinMain(
 			//時間取得
 			MY_FPS_UPDATE();
 
+			///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
+
+			//ゲームの計算
+			MY_CALC_GAME();
+
+			///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
+
 			//WM_PAINTを発生
 			InvalidateRect(MyWin.hwnd, NULL, FALSE);
 
@@ -110,8 +118,6 @@ int WINAPI WinMain(
 			MY_FPS_WAIT();
 		}
 	}
-
-
 	return (int)MyWin.msg.wParam;
 }
 

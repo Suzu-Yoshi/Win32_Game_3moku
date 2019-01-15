@@ -84,7 +84,7 @@ VOID MY_DRAW_CHECK_TEXT(int MaruBatu, HDC double_hdc, RECT rect)
 {
 	switch (MaruBatu)
 	{
-	case GAME_MOJI_NUM_MARU:
+	case GAME_PLAYER_MARU:
 
 		//•\¦êŠ‚Ìİ’è
 		MyFont_MARU.rect = rect;
@@ -94,7 +94,7 @@ VOID MY_DRAW_CHECK_TEXT(int MaruBatu, HDC double_hdc, RECT rect)
 
 		break;
 
-	case GAME_MOJI_NUM_BATU:
+	case GAME_PLAYER_BATU:
 
 		//•\¦êŠ‚Ìİ’è
 		MyFont_BATU.rect = rect;

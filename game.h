@@ -3,7 +3,9 @@
 ///▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 ///########## ヘッダファイル読み込み ##########
+#include <stdio.h>
 #include <windows.h>
+#include <locale.h>
 #include "main.h"
 
 ///########## マクロ定義 ##########
@@ -20,14 +22,11 @@
 #define GAME_MOJI_MARU	"○"	//○の文字
 #define GAME_MOJI_BATU	"×"	//×の文字
 
-#define GAME_MOJI_NUM_MARU	1	//○の種類
-#define GAME_MOJI_NUM_BATU	2	//×の種類
-
+#define GAME_PLAYER_MARU	1	//○の種類
+#define GAME_PLAYER_BATU	2	//×の種類
 
 //○や×の大きさ
 #define GAME_OX_SIZE  100	//GAME_OX_SIZE × GAME_OX_SIZEの大きさで作成 
-
-
 
 ///########## 構造体 ##########
 
@@ -47,6 +46,12 @@
 
 ///▼▼▼▼▼ 本体はgame.cpp ▼▼▼▼▼
 
+//ゲーム内の計算をする関数
+extern VOID MY_CALC_GAME(VOID);
+
+//マスをクリックしたときの配列の処理の関数
+extern VOID MY_CLICK_MASU(POINT,int);
+
 //画面を描画する関数
 extern VOID MY_DRAW_GAME(MY_WIN);
 
@@ -64,5 +69,8 @@ extern VOID MY_INIT_MASU(VOID);
 
 //○や×を表示する関数
 extern VOID MY_DRAW_OX(HDC);
+
+//マウスの位置を表示する関数
+extern VOID MY_DRAW_MOUSE_POINT(HDC);
 
 ///▲▲▲▲▲ 本体はgame.cpp ▲▲▲▲▲

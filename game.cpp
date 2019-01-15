@@ -24,6 +24,12 @@ int masu[GAME_MASU_MAX][GAME_MASU_MAX];
 
 ///########## プロトタイプ宣言 ##########
 
+//ゲーム内の計算をする関数
+VOID MY_CALC_GAME(VOID);
+
+//マスをクリックしたときの配列の処理の関数
+VOID MY_CLICK_MASU(POINT, int);
+
 //画面を描画する関数
 VOID MY_DRAW_GAME(MY_WIN);
 
@@ -41,6 +47,48 @@ VOID MY_INIT_MASU(VOID);
 
 //○や×を表示する関数
 VOID MY_DRAW_OX(HDC);
+
+//マウスの位置を表示する関数
+VOID MY_DRAW_MOUSE_POINT(HDC);
+
+///########## ゲーム内の計算をする関数 ##########
+//引　数：なし
+//戻り値：なし
+VOID MY_CALC_GAME(VOID)
+{
+
+
+}
+
+///########## マスをクリックしたときの配列の処理の関数 ##########
+//引　数：マウス座標X
+//引　数：マウス座標Y
+//引　数：プレイヤーの種類
+//戻り値：なし
+VOID MY_CLICK_MASU(POINT mouse_pt, int player)
+{
+	//縦の場所を計算
+	int tate = mouse_pt.y / GAME_OX_SIZE;
+	//横の場所を計算
+	int yoko = mouse_pt.x / GAME_OX_SIZE;
+
+	if (masu[tate][yoko] == GAME_MASU_NONE)
+	{
+		switch (player)
+		{
+		case GAME_PLAYER_MARU:
+			//○のプレイヤーのとき
+			masu[tate][yoko] = GAME_MASU_MARU;
+
+			break;
+		case GAME_PLAYER_BATU:
+			//×のプレイヤーのとき
+			masu[tate][yoko] = GAME_MASU_BATU;
+
+			break;
+		}
+	}
+}
 
 ///########## 画面を描画する関数 ##########
 //引　数：ﾀﾞﾌﾞﾙﾊﾞｯﾌｧﾘﾝｸﾞ用のﾃﾞﾊﾞｲｽｺﾝﾃｷｽﾄのﾊﾝﾄﾞﾙ
@@ -239,14 +287,14 @@ VOID MY_DRAW_OX(HDC double_hdc)
 				//配列に○のデータが入っているとき
 
 				//文字を描画
-				MY_DRAW_CHECK_TEXT(GAME_MOJI_NUM_MARU, double_hdc, rect);
+				MY_DRAW_CHECK_TEXT(GAME_PLAYER_MARU, double_hdc, rect);
 
 				break;
 			case GAME_MASU_BATU:
 				//配列に×のデータが入っているとき
 
 				//文字を描画
-				MY_DRAW_CHECK_TEXT(GAME_MOJI_NUM_BATU, double_hdc, rect);
+				MY_DRAW_CHECK_TEXT(GAME_PLAYER_BATU, double_hdc, rect);
 
 				break;
 			case GAME_MASU_NONE:
@@ -256,4 +304,40 @@ VOID MY_DRAW_OX(HDC double_hdc)
 			}
 		}
 	}
+}
+
+///########## マウスの位置を表示する関数 ##########
+//引　数：デバイスコンテキストのハンドル
+//引　数：なし
+VOID MY_DRAW_MOUSE_POINT(HDC hdc)
+{
+	//FPS値を整形するための変数
+	CHAR strfpsChr[64];
+	size_t wLen = 0;
+	errno_t err = 0;
+
+	//FPS値を整形
+	sprintf(strfpsChr, "マウス座標[X:%03d][Y:%03d]", MyWin.point_Mouse.x, MyWin.point_Mouse.y);
+
+	//FPS値を表示するための変数
+	TCHAR StrfpsTch[64];
+
+	//ロケール指定
+	setlocale(LC_ALL, "japanese");
+
+	//文字列をマルチバイト文字からワイド文字に変換
+	err = mbstowcs_s(
+		&wLen,				//変換された文字数
+		StrfpsTch,			//変換されたワイド文字
+		strlen(strfpsChr),	//変換する文字数
+		strfpsChr,			//変換するマルチバイト文字
+		_TRUNCATE			//バッファに収まるだけの文字列まで変換
+	);
+
+	SetBkMode(hdc, TRANSPARENT);			//背景色は上書きしない
+	SetTextColor(hdc, RGB(0, 0, 0));		//文字色
+	SetBkColor(hdc, RGB(255, 255, 255));	//背景色
+
+	//FPSを描画
+	TextOut(hdc, 5, 20, StrfpsTch, lstrlen(StrfpsTch));
 }

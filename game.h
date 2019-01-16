@@ -26,6 +26,26 @@
 //○や×の大きさ
 #define GAME_OX_SIZE  100	//GAME_OX_SIZE × GAME_OX_SIZEの大きさで作成 
 
+//○の勝利タイトル
+#define GAME_WIN_O_TITLE	"WINNER[○]"
+//○の勝利文
+#define GAME_WIN_O_TEXT		"○の勝ち"
+
+//×の勝利タイトル
+#define GAME_WIN_X_TITLE	"WINNER[×]"
+//×の勝利文
+#define GAME_WIN_X_TEXT		"×の勝ち"
+
+//引き分けのタイトル
+#define GAME_DRAW_TITLE		"DRAW"
+//引き分けの勝利文
+#define GAME_DRAW_TEXT		"引き分け"
+
+//もう一度遊ぶかのタイトル
+#define GAME_WIN_REPLAY_TITLE	"REPLAY?"
+//もう一度遊ぶかの文
+#define GAME_WIN_REPLAY_TEXT	"もう一度遊びますか？"
+
 ///########## 構造体 ##########
 
 ///########## 名前の再定義 ##########
@@ -51,7 +71,7 @@ extern VOID MY_CALC_GAME(VOID);
 extern VOID MY_CLICK_MASU(VOID);
 
 //マスをクリックしたときの配列の変更を行う関数
-extern VOID MY_CHANGE_MASU(POINT,int);
+extern BOOL MY_CHANGE_MASU(POINT,int);
 
 //画面を描画する関数
 extern VOID MY_DRAW_GAME(MY_WIN);
@@ -78,6 +98,6 @@ extern VOID MY_DRAW_MOUSE_POINT(HDC);
 extern VOID MY_INIT_PLAYER_TURN(VOID);
 
 //勝敗チェックをする関数
-extern VOID MY_CHECK_WIN_LOSE(VOID);
+extern VOID MY_CHECK_WIN_LOSE(HWND);
 
 ///▲▲▲▲▲ 本体はgame.cpp ▲▲▲▲▲

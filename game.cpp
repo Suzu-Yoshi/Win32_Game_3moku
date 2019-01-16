@@ -34,7 +34,7 @@ VOID MY_CALC_GAME(VOID);
 VOID MY_CLICK_MASU(VOID);
 
 //マスをクリックしたときの配列の処理の関数
-VOID MY_CHANGE_MASU(POINT, int);
+BOOL MY_CHANGE_MASU(POINT, int);
 
 //画面を描画する関数
 VOID MY_DRAW_GAME(MY_WIN);
@@ -61,7 +61,7 @@ VOID MY_DRAW_MOUSE_POINT(HDC);
 VOID MY_INIT_PLAYER_TURN(VOID);
 
 //勝敗チェックをする関数
-VOID MY_CHECK_WIN_LOSE(VOID);
+VOID MY_CHECK_WIN_LOSE(HWND);
 
 ///########## ゲーム内の計算をする関数 ##########
 //引　数：なし
@@ -77,26 +77,37 @@ VOID MY_CALC_GAME(VOID)
 //戻り値：なし
 VOID MY_CLICK_MASU(VOID)
 {
+
+	BOOL isClickNone = FALSE;
+
 	switch (player_turn)
 	{
 	case GAME_MASU_MARU:
 		//○のプレイヤーのとき
 
 		//マスをクリックしたときの配列の処理
-		MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_MARU);
+		isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_MARU);
 
-		//プレイヤーの番を変更する
-		player_turn = GAME_MASU_BATU;
+		//○か×が置けたとき
+		if (isClickNone == TRUE)
+		{
+			//プレイヤーの番を変更する
+			player_turn = GAME_MASU_BATU;
+		}
 
 		break;
 	case GAME_MASU_BATU:
 		//×のプレイヤーのとき
 
 		//マスをクリックしたときの配列の処理
-		MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_BATU);
+		isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_BATU);
 
-		//プレイヤーの番を変更する
-		player_turn = GAME_MASU_MARU;
+		//○か×が置けたとき
+		if (isClickNone == TRUE)
+		{
+			//プレイヤーの番を変更する
+			player_turn = GAME_MASU_MARU;
+		}
 
 		break;
 	}
@@ -107,8 +118,9 @@ VOID MY_CLICK_MASU(VOID)
 //引　数：マウス座標X
 //引　数：マウス座標Y
 //引　数：プレイヤーの種類
-//戻り値：なし
-VOID MY_CHANGE_MASU(POINT mouse_pt, int player)
+//戻り値：○か×を置けたらTRUE
+//戻り値：○か×が既に置かれていたらFALSE
+BOOL MY_CHANGE_MASU(POINT mouse_pt, int player)
 {
 	//縦の場所を計算
 	int tate = mouse_pt.y / GAME_OX_SIZE;
@@ -117,6 +129,8 @@ VOID MY_CHANGE_MASU(POINT mouse_pt, int player)
 
 	if (masu[tate][yoko] == GAME_MASU_NONE)
 	{
+		//○か×がまだ置いていないとき
+
 		switch (player)
 		{
 		case GAME_MASU_MARU:
@@ -130,6 +144,16 @@ VOID MY_CHANGE_MASU(POINT mouse_pt, int player)
 
 			break;
 		}
+
+		//○か×が置けた
+		return TRUE;
+	}
+	else
+	{
+		//○か×が既に置かれているとき
+
+		//○か×が置けなかった
+		return FALSE;
 	}
 }
 
@@ -418,7 +442,7 @@ VOID MY_INIT_PLAYER_TURN(VOID)
 ///########## 勝敗チェックをする関数 ##########
 //引　数：なし
 //戻り値：なし
-VOID MY_CHECK_WIN_LOSE(VOID)
+VOID MY_CHECK_WIN_LOSE(HWND hwnd)
 {
 	//配列の添字に使用
 	int tate;
@@ -426,147 +450,261 @@ VOID MY_CHECK_WIN_LOSE(VOID)
 	int naname;
 
 	//○と×の数をカウント
-	int maru_cnt = 0;
-	int batu_cnt = 0;
+	int maru_cnt;
+	int batu_cnt;
+	int draw_cnt;
 
+	//TRUEなら、勝利
 	BOOL maru_win = FALSE;
 	BOOL batu_win = FALSE;
+
+	//引き分け
+	BOOL maru_batu_draw = FALSE;
+
+	//もう一度遊ぶかのメッセージボックスの戻り値
+	int retPlayMsgBox;
 
 	//+++++ 縦が揃っているかチェック ++++++++++++++++++++
 	if (maru_win == FALSE && batu_win == FALSE)
 	{
+		//○と×の数を初期化
+		maru_cnt = 0;
+		batu_cnt = 0;
+
 		for (yoko = 0; yoko < GAME_MASU_MAX; yoko++)
 		{
+			//○と×の数を初期化
+			maru_cnt = 0;
+			batu_cnt = 0;
+
 			for (tate = 0; tate < GAME_MASU_MAX; tate++)
 			{
-				switch (masu[tate][yoko])
+				//○の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_MARU)
 				{
-				case GAME_MASU_MARU:
 					maru_cnt++;
+				}
 
-					break;
-
-				case GAME_MASU_BATU:
+				//×の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_BATU)
+				{
 					batu_cnt++;
-					break;
-
 				}
 			}
 
-			//○が並んだとき
+			//○が並んだとき→○の勝利
 			if (maru_cnt == GAME_MASU_MAX)
 			{
-				//○の勝利
-				maru_win = TRUE;
-
-				break;
+				maru_win = TRUE;	break;
 			}
 
-			//×が並んだとき
+			//×が並んだとき→×の勝利
 			if (batu_cnt == GAME_MASU_MAX)
 			{
-				//×の勝利
-				batu_win = TRUE;
-
-				break;
+				batu_win = TRUE;	break;
 			}
-
-			//○と×の数をカウント
-			maru_cnt = 0;
-			batu_cnt = 0;
 		}
 	}
 
 	//+++++ 横が揃っているかチェック ++++++++++++++++++++
 	if (maru_win == FALSE && batu_win == FALSE)
 	{
+		//○と×の数を初期化
+		maru_cnt = 0;
+		batu_cnt = 0;
+
 		for (tate = 0; tate < GAME_MASU_MAX; tate++)
 		{
+			//○と×の数を初期化
+			maru_cnt = 0;
+			batu_cnt = 0;
+
 			for (yoko = 0; yoko < GAME_MASU_MAX; yoko++)
 			{
-				switch (masu[tate][yoko])
+				//○の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_MARU)
 				{
-				case GAME_MASU_MARU:
 					maru_cnt++;
+				}
 
-					break;
-
-				case GAME_MASU_BATU:
+				//×の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_BATU)
+				{
 					batu_cnt++;
-					break;
-
 				}
 			}
 
-			//○が並んだとき
+			//○が並んだとき→○の勝利
 			if (maru_cnt == GAME_MASU_MAX)
 			{
-				//○の勝利
-				maru_win = TRUE;
-
-				break;
+				maru_win = TRUE;	break;
 			}
 
-			//×が並んだとき
+			//×が並んだとき→×の勝利
 			if (batu_cnt == GAME_MASU_MAX)
 			{
-				//×の勝利
-				batu_win = TRUE;
-
-				break;
+				batu_win = TRUE;	break;
 			}
-
-			//○と×の数をカウント
-			maru_cnt = 0;
-			batu_cnt = 0;
 		}
 	}
 
 	//+++++ 斜め(右下がり)が揃っているかチェック ++++++++++++++++++++
 	if (maru_win == FALSE && batu_win == FALSE)
 	{
+		//○と×の数を初期化
+		maru_cnt = 0;
+		batu_cnt = 0;
+
 		for (naname = 0; naname < GAME_MASU_MAX; naname++)
 		{
-			switch (masu[naname][naname])
+			//○の数をカウント
+			if (masu[naname][naname] == GAME_MASU_MARU)
 			{
-			case GAME_MASU_MARU:
 				maru_cnt++;
-
-				break;
-
-			case GAME_MASU_BATU:
-				batu_cnt++;
-				break;
-
 			}
 
-			//○が並んだとき
+			//×の数をカウント
+			if (masu[naname][naname] == GAME_MASU_BATU)
+			{
+				batu_cnt++;
+			}
+
+			//○が並んだとき→○の勝利
 			if (maru_cnt == GAME_MASU_MAX)
 			{
-				//○の勝利
-				maru_win = TRUE;
-
-				break;
+				maru_win = TRUE;	break;
 			}
 
-			//×が並んだとき
+			//×が並んだとき→×の勝利
 			if (batu_cnt == GAME_MASU_MAX)
 			{
-				//×の勝利
-				batu_win = TRUE;
-
-				break;
+				batu_win = TRUE;	break;
 			}
-
-			//○と×の数をカウント
-			maru_cnt = 0;
-			batu_cnt = 0;
 		}
 	}
 
+	//+++++ 斜め(右上がり)が揃っているかチェック ++++++++++++++++++++
+	if (maru_win == FALSE && batu_win == FALSE)
+	{
+		//○と×の数を初期化
+		maru_cnt = 0;
+		batu_cnt = 0;
 
+		for (naname = 0; naname < GAME_MASU_MAX; naname++)
+		{
+			//○の数をカウント
+			if (masu[naname][(GAME_MASU_MAX - 1) - naname] == GAME_MASU_MARU)
+			{
+				maru_cnt++;
+			}
+
+			//×の数をカウント
+			if (masu[naname][(GAME_MASU_MAX - 1) - naname] == GAME_MASU_BATU)
+			{
+				batu_cnt++;
+			}
+
+			//○が並んだとき→○の勝利
+			if (maru_cnt == GAME_MASU_MAX)
+			{
+				maru_win = TRUE;	break;
+			}
+
+			//×が並んだとき→×の勝利
+			if (batu_cnt == GAME_MASU_MAX)
+			{
+				batu_win = TRUE;	break;
+			}
+		}
+	}
+
+	//+++++ 引き分けかチェック ++++++++++++++++++++
+	if (maru_win == FALSE && batu_win == FALSE)
+	{
+		//○と×の数を初期化
+		maru_cnt = 0;
+		batu_cnt = 0;
+
+		for (tate = 0; tate < GAME_MASU_MAX; tate++)
+		{
+			for (yoko = 0; yoko < GAME_MASU_MAX; yoko++)
+			{
+				//○の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_MARU)
+				{
+					maru_cnt++;
+				}
+
+				//×の数をカウント
+				if (masu[tate][yoko] == GAME_MASU_BATU)
+				{
+					batu_cnt++;
+				}
+			}
+		}
+	}
+
+	//○と×の合計数を計算
+	draw_cnt = maru_cnt + batu_cnt;
+
+	//○と×の合計数がマスの合計数と同じ時、引き分け
+	if (draw_cnt == (GAME_MASU_MAX * GAME_MASU_MAX))
+	{
+		maru_batu_draw = TRUE;
+	}
+
+	//まだ勝者がいないときは関数を抜ける
+	if (maru_win == FALSE && batu_win == FALSE && maru_batu_draw == FALSE)
+	{
+		return;
+	}
+
+	//○の勝利
+	if (maru_win == TRUE)
+	{
+		//メッセージボックスを表示
+		MessageBox(NULL, TEXT(GAME_WIN_O_TEXT), TEXT(GAME_WIN_O_TITLE), MB_OK);
+	}
+
+	//×の勝利
+	if (batu_win == TRUE)
+	{
+		//メッセージボックスを表示
+		MessageBox(NULL, TEXT(GAME_WIN_X_TEXT), TEXT(GAME_WIN_X_TITLE), MB_OK);
+	}
+
+	//引き分け
+	if (maru_batu_draw == TRUE)
+	{
+		//メッセージボックスを表示
+		MessageBox(NULL, TEXT(GAME_DRAW_TEXT), TEXT(GAME_DRAW_TITLE), MB_OK);
+	}
+
+	//もう一度遊ぶか質問する
 
 	//メッセージボックスを表示
-	MessageBox(NULL, TEXT("○の勝ち"), TEXT("TITLE"), MB_OK);
+	retPlayMsgBox = MessageBox(NULL, TEXT(GAME_WIN_REPLAY_TEXT), TEXT(GAME_WIN_REPLAY_TITLE), MB_YESNO | MB_ICONQUESTION);
+
+	//「はい」ボタンを押したとき
+	if (retPlayMsgBox == IDYES)
+	{
+		//初期化の処理を行う
+
+		//マスの初期化
+		MY_INIT_MASU();
+
+		//プレイヤーの初期化
+		MY_INIT_PLAYER_TURN();
+
+	}
+
+	//「いいえ」ボタンを押したとき
+	if (retPlayMsgBox == IDNO)
+	{
+		//終了処理を行う
+
+		//ウィンドウを破棄する
+		DestroyWindow(hwnd);
+	}
 
 }

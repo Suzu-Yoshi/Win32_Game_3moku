@@ -114,6 +114,13 @@ int WINAPI WinMain(
 			//WM_PAINTを発生
 			InvalidateRect(MyWin.hwnd, NULL, FALSE);
 
+			///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
+
+			//勝敗チェック
+			MY_CHECK_WIN_LOSE(MyWin.hwnd);
+
+			///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
+
 			//指定したFPSになるように待つ
 			MY_FPS_WAIT();
 		}

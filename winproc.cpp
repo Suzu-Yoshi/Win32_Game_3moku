@@ -48,18 +48,18 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
 
-		//マスの初期化
-		MY_INIT_MASU();
-
-		//プレイヤーの初期化
-		MY_INIT_PLAYER_TURN();
-
 		//文字の初期化
 		MY_FONT_INIT();
 
 		//フォントの読み込み
 		if (MY_FONT_READ(hwnd) == FALSE)
 		{	return -1;}//読み込みに異常アリ
+
+		//マスの初期化
+		MY_INIT_MASU();
+
+		//プレイヤーの初期化
+		MY_INIT_PLAYER_TURN();
 
 		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 
@@ -112,9 +112,6 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
 		//マスをクリックしたときの処理を行う
 		MY_CLICK_MASU();
-
-		//勝敗チェック
-		MY_CHECK_WIN_LOSE();
 
 		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 

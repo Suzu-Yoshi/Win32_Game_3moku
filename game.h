@@ -26,6 +26,16 @@
 //○や×の大きさ
 #define GAME_OX_SIZE  100	//GAME_OX_SIZE × GAME_OX_SIZEの大きさで作成 
 
+//先攻のタイトル
+#define GAME_SENKOU_TITLE	"先行"
+//先攻の文
+#define GAME_SENKOU_TEXT	"あなたは先行「○」です"
+
+//後攻のタイトル
+#define GAME_KOUKOU_TITLE	"後攻"
+//後攻の文
+#define GAME_KOUKOU_TEXT	"あなたは後攻「×」です"
+
 //○の勝利タイトル
 #define GAME_WIN_O_TITLE	"WINNER[○]"
 //○の勝利文
@@ -64,9 +74,6 @@
 
 ///▼▼▼▼▼ 本体はgame.cpp ▼▼▼▼▼
 
-//ゲーム内の計算をする関数
-extern VOID MY_CALC_GAME(VOID);
-
 //マスをクリックしたときの処理を行う関数
 extern VOID MY_CLICK_MASU(VOID);
 
@@ -94,10 +101,16 @@ extern VOID MY_DRAW_OX(HDC);
 //マウスの位置を表示する関数
 extern VOID MY_DRAW_MOUSE_POINT(HDC);
 
+//プレイヤーの番を表示する関数
+extern VOID MY_DRAW_PLAYER_OX(HDC);
+
 //プレイヤーの番を初期化する関数
 extern VOID MY_INIT_PLAYER_TURN(VOID);
 
 //勝敗チェックをする関数
 extern VOID MY_CHECK_WIN_LOSE(HWND);
+
+//コンピュータの入力をする関数
+extern VOID MY_INPUT_COMPUTER(VOID);
 
 ///▲▲▲▲▲ 本体はgame.cpp ▲▲▲▲▲

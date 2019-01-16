@@ -104,17 +104,17 @@ int WINAPI WinMain(
 			//時間取得
 			MY_FPS_UPDATE();
 
-			///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
+			///▼▼▼▼▼ 【画面更新前】ゲーム固有の設定ここから ▼▼▼▼▼
 
-			//ゲームの計算
-			MY_CALC_GAME();
+			//コンピュータの入力
+			MY_INPUT_COMPUTER();
 
 			///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 
 			//WM_PAINTを発生
 			InvalidateRect(MyWin.hwnd, NULL, FALSE);
 
-			///▼▼▼▼▼ ゲーム固有の設定ここから ▼▼▼▼▼
+			///▼▼▼▼▼ 【画面更新後】ゲーム固有の設定ここから ▼▼▼▼▼
 
 			//勝敗チェック
 			MY_CHECK_WIN_LOSE(MyWin.hwnd);

@@ -25,10 +25,14 @@ int masu[GAME_MASU_MAX][GAME_MASU_MAX];
 //プレイヤーの番を管理する変数
 int player_turn;
 
-///########## プロトタイプ宣言 ##########
+//先行と後攻を管理
+int player_my = GAME_MASU_NONE;	//自分
+int player_cp = GAME_MASU_NONE;	//コンピュータ
 
-//ゲーム内の計算をする関数
-VOID MY_CALC_GAME(VOID);
+//空いているマスを管理
+int masu_Blank[GAME_MASU_MAX * GAME_MASU_MAX];
+
+///########## プロトタイプ宣言 ##########
 
 //マスをクリックしたときの処理を行う関数
 VOID MY_CLICK_MASU(VOID);
@@ -57,20 +61,17 @@ VOID MY_DRAW_OX(HDC);
 //マウスの位置を表示する関数
 VOID MY_DRAW_MOUSE_POINT(HDC);
 
+//プレイヤーの番を表示する関数
+VOID MY_DRAW_PLAYER_OX(HDC);
+
 //プレイヤーの番を初期化する関数
 VOID MY_INIT_PLAYER_TURN(VOID);
 
 //勝敗チェックをする関数
 VOID MY_CHECK_WIN_LOSE(HWND);
 
-///########## ゲーム内の計算をする関数 ##########
-//引　数：なし
-//戻り値：なし
-VOID MY_CALC_GAME(VOID)
-{
-
-
-}
+//コンピュータの入力をする関数
+VOID MY_INPUT_COMPUTER(VOID);
 
 ///########## マスをクリックしたときの処理を行う関数 ##########
 //引　数：なし
@@ -80,36 +81,40 @@ VOID MY_CLICK_MASU(VOID)
 
 	BOOL isClickNone = FALSE;
 
-	switch (player_turn)
+	//自分の番のとき
+	if (player_turn == player_my)
 	{
-	case GAME_MASU_MARU:
-		//○のプレイヤーのとき
-
-		//マスをクリックしたときの配列の処理
-		isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_MARU);
-
-		//○か×が置けたとき
-		if (isClickNone == TRUE)
+		switch (player_turn)
 		{
-			//プレイヤーの番を変更する
-			player_turn = GAME_MASU_BATU;
+		case GAME_MASU_MARU:
+			//○のプレイヤーのとき
+
+			//マスをクリックしたときの配列の処理
+			isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_MARU);
+
+			//○か×が置けたとき
+			if (isClickNone == TRUE)
+			{
+				//プレイヤーの番を変更する
+				player_turn = GAME_MASU_BATU;
+			}
+
+			break;
+		case GAME_MASU_BATU:
+			//×のプレイヤーのとき
+
+			//マスをクリックしたときの配列の処理
+			isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_BATU);
+
+			//○か×が置けたとき
+			if (isClickNone == TRUE)
+			{
+				//プレイヤーの番を変更する
+				player_turn = GAME_MASU_MARU;
+			}
+
+			break;
 		}
-
-		break;
-	case GAME_MASU_BATU:
-		//×のプレイヤーのとき
-
-		//マスをクリックしたときの配列の処理
-		isClickNone = MY_CHANGE_MASU(MyWin.point_Mouse, GAME_MASU_BATU);
-
-		//○か×が置けたとき
-		if (isClickNone == TRUE)
-		{
-			//プレイヤーの番を変更する
-			player_turn = GAME_MASU_MARU;
-		}
-
-		break;
 	}
 
 }
@@ -409,6 +414,30 @@ VOID MY_DRAW_MOUSE_POINT(HDC hdc)
 	TextOut(hdc, 5, 20, StrfpsTch, lstrlen(StrfpsTch));
 }
 
+///########## プレイヤーの番を表示する関数 ##########
+//引　数：デバイスコンテキストのハンドル
+//引　数：なし
+VOID MY_DRAW_PLAYER_OX(HDC hdc)
+{
+	TCHAR strPlayer[64];
+
+	if (player_my == GAME_MASU_MARU)
+	{
+		wsprintf(strPlayer, TEXT("先行：プレイヤー：○"));
+	}
+	if (player_my == GAME_MASU_BATU)
+	{
+		wsprintf(strPlayer, TEXT("後攻：プレイヤー：×"));
+	}
+
+	SetBkMode(hdc, TRANSPARENT);			//背景色は上書きしない
+	SetTextColor(hdc, RGB(0, 0, 0));		//文字色
+	SetBkColor(hdc, RGB(255, 255, 255));	//背景色
+
+	//プレイヤーの番を描画
+	TextOut(hdc, 5, 35, strPlayer, lstrlen(strPlayer));
+}
+
 ///########## プレイヤーの番を初期化する関数 ##########
 //引　数：なし
 //戻り値：なし
@@ -423,17 +452,31 @@ VOID MY_INIT_PLAYER_TURN(VOID)
 	//時刻をもとに乱数表を作成
 	srand((unsigned)time(NULL));
 
-	//ランダムで0か1を選ぶ
+	//ランダムで1か2を選ぶ
 	random = (rand() % 2) + 1;
 
 	//役割を入れる
 	switch (random)
 	{
 	case GAME_MASU_MARU:
-		player_turn = GAME_MASU_MARU;
+		//player_turn = GAME_MASU_MARU;
+
+		//メッセージボックスを表示
+		MessageBox(NULL, TEXT(GAME_SENKOU_TEXT), TEXT(GAME_SENKOU_TITLE), MB_OK);
+
+		player_turn = player_my = GAME_MASU_MARU;	//先行
+		player_cp = GAME_MASU_BATU;	//後攻
+
 		break;
 	case GAME_MASU_BATU:
-		player_turn = GAME_MASU_BATU;
+		//player_turn = GAME_MASU_BATU;
+
+		//メッセージボックスを表示
+		MessageBox(NULL, TEXT(GAME_KOUKOU_TEXT), TEXT(GAME_KOUKOU_TITLE), MB_OK);
+
+		player_my = GAME_MASU_BATU;	//後攻
+		player_turn = player_cp = GAME_MASU_MARU;	//先行
+
 		break;
 	}
 
@@ -705,6 +748,92 @@ VOID MY_CHECK_WIN_LOSE(HWND hwnd)
 
 		//ウィンドウを破棄する
 		DestroyWindow(hwnd);
+	}
+
+}
+
+///########## コンピュータの入力をする関数 ##########
+//引　数：なし
+//戻り値：なし
+VOID MY_INPUT_COMPUTER(VOID)
+{
+
+	//空いている場所をチェックで使用
+	int tate;
+	int yoko;
+
+	//ランダムの範囲
+	int randam_MAX = GAME_MASU_MAX * GAME_MASU_MAX;
+
+	//ランダムで場所を決める
+	int random_tate;
+	int random_yoko;
+
+	//○か×を置いたとき
+	BOOL isPutOX = FALSE;
+
+	//空いている場所をチェック
+	for (tate = 0; tate < GAME_MASU_MAX; tate++)
+	{
+		for (yoko = 0; yoko < GAME_MASU_MAX; yoko++)
+		{
+			//マスになにか入っていないとき
+			if (masu[tate][yoko] == GAME_MASU_NONE)
+			{
+
+			}
+		}
+	}
+
+
+	//コンピュータのターンであるとき
+	if (player_cp == player_turn)
+	{
+		//○か×を置くまで無限ループ
+		while (isPutOX == FALSE)
+		{
+			//時刻をもとに乱数表を作成
+			srand((unsigned)time(NULL));
+
+			//ランダムで場所を選ぶ
+			random_tate = rand() % GAME_MASU_MAX;
+			random_yoko = rand() % GAME_MASU_MAX;
+
+			//コンピュータが先行のとき
+			if (player_cp == GAME_MASU_MARU)
+			{
+				//まだ○か×が置かれていないとき
+				if (masu[random_tate][random_yoko] == GAME_MASU_NONE)
+				{
+					//○を置く
+					masu[random_tate][random_yoko] = GAME_MASU_MARU;
+
+					//人間の番にする
+					player_turn = player_my;
+
+					//○か×を置いた
+					isPutOX = TRUE;
+				}
+			}
+
+			//コンピュータが後攻のとき
+			if (player_cp == GAME_MASU_BATU)
+			{
+				//まだ○か×が置かれていないとき
+				if (masu[random_tate][random_yoko] == GAME_MASU_NONE)
+				{
+					//×を置く
+					masu[random_tate][random_yoko] = GAME_MASU_BATU;
+
+					//人間の番にする
+					player_turn = player_my;
+
+					//○か×を置いた
+					isPutOX = TRUE;
+				}
+			}
+		}
+
 	}
 
 }

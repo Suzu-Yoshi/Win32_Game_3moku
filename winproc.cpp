@@ -86,6 +86,9 @@ LRESULT CALLBACK MY_WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 		//マウスの座標を描画
 		MY_DRAW_MOUSE_POINT(MyWin.hdc_double);
 
+		//プレイヤーの番を描画
+		MY_DRAW_PLAYER_OX(MyWin.hdc_double);
+
 		///▲▲▲▲▲ ゲーム固有の設定ここまで ▲▲▲▲▲
 
 		//メモリ内の画像を描画

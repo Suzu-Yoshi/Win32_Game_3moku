@@ -758,12 +758,48 @@ VOID MY_CHECK_WIN_LOSE(HWND hwnd)
 VOID MY_INPUT_COMPUTER(VOID)
 {
 	//ランダムで場所を決める
-	int random_tate;
-	int random_yoko;
+	int random;
+
+	//ランダムの範囲
+	int randam_MAX = 0;
 
 	//○か×を置いたとき
 	BOOL isPutOX = FALSE;
 	
+	//空いている場所をチェックで使用
+	int tate_for;
+	int yoko_for;
+
+	int tate_random;
+	int yoko_random;
+
+	//まだ何もおいていないマスの場所を入れる
+	int none_masu[GAME_MASU_MAX * GAME_MASU_MAX];
+
+	//空いている場所をチェック
+	for (tate_for = 0; tate_for < GAME_MASU_MAX; tate_for++)
+	{
+		for (yoko_for = 0; yoko_for < GAME_MASU_MAX; yoko_for++)
+		{
+			//マスになにか入っていないときをカウント
+			if (masu[tate_for][yoko_for] == GAME_MASU_NONE)
+			{
+				//何も入っていないマスの場所を入れる
+				none_masu[randam_MAX] = tate_for * GAME_MASU_MAX + yoko_for;
+
+				//何も入っていないマスをカウント→ランダムの上限値
+				randam_MAX++;
+			}
+		}
+	}
+
+	//何も入っていないマスが0個のとき→引き分けのとき
+	if (randam_MAX == 0)
+	{
+		//○か×を置かない
+		return;
+	}
+
 	//コンピュータのターンであるとき
 	if (player_cp == player_turn)
 	{
@@ -774,17 +810,22 @@ VOID MY_INPUT_COMPUTER(VOID)
 			srand((unsigned)time(NULL));
 
 			//ランダムで場所を選ぶ
-			random_tate = rand() % GAME_MASU_MAX;
-			random_yoko = rand() % GAME_MASU_MAX;
+			random = rand() % randam_MAX;
+
+			//縦の位置を復元
+			tate_random = none_masu[random] / GAME_MASU_MAX;
+			
+			//横の位置を復元
+			yoko_random = none_masu[random] % GAME_MASU_MAX;
 
 			//コンピュータが先行のとき
 			if (player_cp == GAME_MASU_MARU)
 			{
 				//まだ○か×が置かれていないとき
-				if (masu[random_tate][random_yoko] == GAME_MASU_NONE)
+				if (masu[tate_random][yoko_random] == GAME_MASU_NONE)
 				{
 					//○を置く
-					masu[random_tate][random_yoko] = GAME_MASU_MARU;
+					masu[tate_random][yoko_random] = GAME_MASU_MARU;
 
 					//人間の番にする
 					player_turn = player_my;
@@ -798,10 +839,10 @@ VOID MY_INPUT_COMPUTER(VOID)
 			if (player_cp == GAME_MASU_BATU)
 			{
 				//まだ○か×が置かれていないとき
-				if (masu[random_tate][random_yoko] == GAME_MASU_NONE)
+				if (masu[tate_random][yoko_random] == GAME_MASU_NONE)
 				{
 					//×を置く
-					masu[random_tate][random_yoko] = GAME_MASU_BATU;
+					masu[tate_random][yoko_random] = GAME_MASU_BATU;
 
 					//人間の番にする
 					player_turn = player_my;

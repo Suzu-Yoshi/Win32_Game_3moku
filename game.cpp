@@ -757,35 +757,13 @@ VOID MY_CHECK_WIN_LOSE(HWND hwnd)
 //戻り値：なし
 VOID MY_INPUT_COMPUTER(VOID)
 {
-
-	//空いている場所をチェックで使用
-	int tate;
-	int yoko;
-
-	//ランダムの範囲
-	int randam_MAX = GAME_MASU_MAX * GAME_MASU_MAX;
-
 	//ランダムで場所を決める
 	int random_tate;
 	int random_yoko;
 
 	//○か×を置いたとき
 	BOOL isPutOX = FALSE;
-
-	//空いている場所をチェック
-	for (tate = 0; tate < GAME_MASU_MAX; tate++)
-	{
-		for (yoko = 0; yoko < GAME_MASU_MAX; yoko++)
-		{
-			//マスになにか入っていないとき
-			if (masu[tate][yoko] == GAME_MASU_NONE)
-			{
-
-			}
-		}
-	}
-
-
+	
 	//コンピュータのターンであるとき
 	if (player_cp == player_turn)
 	{
